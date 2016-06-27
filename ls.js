@@ -6,7 +6,8 @@ var debug,
     isNull,
     lat,
     member,
-    rember;
+    rember,
+    firsts;
 
 debug = false;
 
@@ -65,4 +66,11 @@ rember = function (a, l) {
     return (isNull(l) && []) 
            || (a === car(l) && cdr(l))
            || (cons(car(l), rember(a, cdr(l)))) 
+};
+
+// takes a null list or list of lists and returns a list of the first item
+// in each sub-list
+firsts = function (l) {
+    return (isNull(l) && [])
+           || cons(car(car(l)), firsts(cdr(l)))
 };
