@@ -24,7 +24,11 @@ var debug,
     add1,
     sub1,
     plus,
-    minus;
+    minus,
+    addtup,
+    multiply,
+    tupplus,
+    foo;
 
 debug = false;
 
@@ -222,11 +226,11 @@ zero = function (n) {
 
 add1 = function (n) {
     return n + 1;
-}
+};
 
 sub1 = function (n) {
     return n - 1;
-}
+};
 /*****************************************************************************
  * Recursive numeric functions
 *****************************************************************************/
@@ -241,5 +245,26 @@ minus = function (n, m) {
     return (
         zero(n) ? m :
         minus(sub1(n), sub1(m))
+    );
+};
+
+addtup = function (l) {
+    return (
+        isNull(l) ? 0 :
+        plus(car(l), addtup(cdr(l)))
+    );
+};
+
+multiply = function (n, m) {
+    return (
+        zero(m) ? 0 :
+        plus(n, multiply(n, sub1(m)))
+    );
+};
+
+tupplus = function (t, u) {
+    return (
+        isNull(t) ? [] :
+        cons(plus(car(t), car(u)), tupplus(cdr(t), cdr(u)))
     );
 };
