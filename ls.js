@@ -15,7 +15,16 @@ var debug,
     insertR,
     insertL,
     subst,
-    subst2;
+    subst2,
+    multirember,
+    multiinsertR,
+    multiinsertL,
+    multisubst,
+    zero,
+    add1,
+    sub1,
+    plus,
+    minus;
 
 debug = false;
 
@@ -186,7 +195,6 @@ multiinsertR = function (n, o, l) {
     );
 };
 
-
 // inserts new atom n to the left of the first occurance of old atom o in list l
 multiinsertL = function (n, o, l) {
     return (
@@ -202,5 +210,36 @@ multisubst = function (n, o, l) {
         isNull(l) ? [] :
         o === car(l) ? cons(n, multisubst(n, o, cdr(l))) :
         cons(car(l), multisubst(n, o, cdr(l)))
+    );
+};
+
+/*****************************************************************************
+ * Primitive numeric functions
+*****************************************************************************/
+zero = function (n) {
+    return n === 0;
+};
+
+add1 = function (n) {
+    return n + 1;
+}
+
+sub1 = function (n) {
+    return n - 1;
+}
+/*****************************************************************************
+ * Recursive numeric functions
+*****************************************************************************/
+plus = function (n, m) {
+    return (
+        zero(n) ? m :
+        plus(sub1(n), add1(m))
+    );
+};
+
+minus = function (n, m) {
+    return (
+        zero(n) ? m :
+        minus(sub1(n), sub1(m))
     );
 };
