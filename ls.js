@@ -13,7 +13,8 @@ var debug,
     firsts,
     firsts2,
     insertR,
-    insertL;
+    insertL,
+    subst;
 
 debug = false;
 
@@ -148,3 +149,12 @@ insertL = function (n, o, l) {
     );
 };
 
+
+// substitutes new atom n for the first occurance of old atom o in list l
+subst = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        o === car(l) ? cons(n, cdr(l)) :
+        cons(car(l), subst(n, o, cdr(l)))
+    );
+};
