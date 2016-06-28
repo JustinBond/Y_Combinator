@@ -14,7 +14,8 @@ var debug,
     firsts2,
     insertR,
     insertL,
-    subst;
+    subst,
+    subst2;
 
 debug = false;
 
@@ -149,12 +150,57 @@ insertL = function (n, o, l) {
     );
 };
 
-
 // substitutes new atom n for the first occurance of old atom o in list l
 subst = function (n, o, l) {
     return (
         isNull(l) ? [] :
         o === car(l) ? cons(n, cdr(l)) :
         cons(car(l), subst(n, o, cdr(l)))
+    );
+};
+
+// substitutes new atom n for the first occurance of old atom o1 or o2 in list l
+subst2 = function (n, o1, o2, l) {
+    return (
+        isNull(l) ? [] :
+        (o1 === car(l) || o2 === car(l)) ? cons(n, cdr(l)) :
+        cons(car(l), subst2(n, o1, o2, cdr(l)))
+    );
+};
+
+// returns lat l with all occurances of atom a removed       
+multirember = function (a, l) {
+    return (
+        isNull(l) ? [] :
+        a === car(l) ? multirember(a, cdr(l)) :
+        cons(car(l), multirember(a, cdr(l)))
+    );
+};
+
+// inserts new atom n to the right of the all occurance of old atom o in list l
+multiinsertR = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        o === car(l) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
+        cons(car(l), multiinsertR(n, o, cdr(l)))
+    );
+};
+
+
+// inserts new atom n to the left of the first occurance of old atom o in list l
+multiinsertL = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        o === car(l) ? cons(n, cons(o, multiinsertL(n, o, cdr(l)))) :
+        cons(car(l), multiinsertL(n, o, cdr(l)))
+    );
+};
+
+// substitutes new atom n for the first occurance of old atom o in list l
+multisubst = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        o === car(l) ? cons(n, multisubst(n, o, cdr(l))) :
+        cons(car(l), multisubst(n, o, cdr(l)))
     );
 };
