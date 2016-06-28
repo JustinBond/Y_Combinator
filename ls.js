@@ -4,6 +4,7 @@ var debug,
     cdr,
     cons,
     isNull,
+    eq,
     lat,
     member,
     member2,
@@ -23,11 +24,22 @@ var debug,
     zero,
     add1,
     sub1,
+    number,
     plus,
     minus,
     addtup,
     multiply,
     tupplus,
+    gt,
+    lt,
+    divide,
+    exp,
+    neq,
+    length,
+    pick,
+    rempick,
+    no_nums,
+    all_nums,
     foo;
 
 debug = false;
@@ -68,6 +80,11 @@ isNull = function (l) {
     return l.length === 0;
 };
 
+// string equals
+eq = function (a, b) {
+    return a === b;
+};
+
 /*****************************************************************************
  * Recursive functions
 *****************************************************************************/
@@ -90,7 +107,7 @@ lat = function (l) {
 member = function (a, l) {
     return (
         isNull(l) ? false :
-        a === car(l) ? true :
+        eq(a, car(l)) ? true :
         member(a, cdr(l))
     );
 };
@@ -220,20 +237,32 @@ multisubst = function (n, o, l) {
 /*****************************************************************************
  * Primitive numeric functions
 *****************************************************************************/
+// returns true of number n is 0
 zero = function (n) {
     return n === 0;
 };
 
+// adds 1 to n
 add1 = function (n) {
     return n + 1;
 };
 
+// subtracts 1 from n
 sub1 = function (n) {
     return n - 1;
+};
+
+// returns true if atom a is of type number
+number = function (a) {
+    if (typeof a === 'number') {
+        return true;
+    }
+    return false;
 };
 /*****************************************************************************
  * Recursive numeric functions
 *****************************************************************************/
+// add
 plus = function (n, m) {
     return (
         zero(n) ? m :
@@ -241,13 +270,15 @@ plus = function (n, m) {
     );
 };
 
+// subtract
 minus = function (n, m) {
     return (
-        zero(n) ? m :
+        zero(m) ? n :
         minus(sub1(n), sub1(m))
     );
 };
 
+// adds the elements in a list
 addtup = function (l) {
     return (
         isNull(l) ? 0 :
@@ -255,6 +286,7 @@ addtup = function (l) {
     );
 };
 
+// multiplies n and m
 multiply = function (n, m) {
     return (
         zero(m) ? 0 :
@@ -262,9 +294,98 @@ multiply = function (n, m) {
     );
 };
 
+// returns a list with the sum of the numbers in lists t and u
 tupplus = function (t, u) {
     return (
-        isNull(t) ? [] :
+        isNull(t) ? u :
+        isNull(u) ? t :
         cons(plus(car(t), car(u)), tupplus(cdr(t), cdr(u)))
+    );
+};
+
+// greater than
+gt = function (n, m) {
+    return (
+        zero(n) ? false :
+        zero(m) ? true :
+        gt(sub1(n), sub1(m))
+    );
+};
+
+// less than
+lt = function (n, m) {
+    return (
+        zero(m) ? false :
+        zero(n) ? true :
+        lt(sub1(n), sub1(m))
+    );
+};
+
+// numeric equals
+neq = function (n, m) {
+    return (
+        zero(n) && zero(m) ? true :
+        zero(n) || zero(m) ? false :
+        neq(sub1(n), sub1(m))
+    );
+};
+
+// returns n to the power of m 
+exp = function (n, m) {
+    return (
+        zero(m) ? 1 :
+        multiply(n, exp(n, sub1(m)))
+    );
+};
+
+// divide n by m
+// n must be evenly divisible by m
+divide = function (n, m) {
+    return (
+        lt(n, m) ? 0 :
+        add1(divide(minus(n, m), m))
+    );
+};
+
+// returns the number of elements in a lat
+length = function (l) {
+    return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );
+};
+
+// returns element number n from lat l
+pick = function (n, l) {
+    return (
+        neq(n, 1) ? car(l) :
+        pick(sub1(n), cdr(l))
+    );
+};
+
+// returns lat l minus element number n
+rempick = function (n, l) {
+    return (
+        isNull(l) ? [] :
+        neq(n, 1) ? rempick(sub1(n), cdr(l)) :
+        cons(car(l), rempick(sub1(n), cdr(l)))
+    );
+};
+
+// returns the non-numbers in a lat
+no_nums = function (l) {
+    return (
+        isNull(l) ? [] :
+        number(car(l)) ? no_nums(cdr(l)) :
+        cons(car(l), no_nums(cdr(l)))
+    );
+};
+
+// returns the numbers in a lat
+all_nums = function (l) {
+    return (
+        isNull(l) ? [] :
+        number(car(l)) ? cons(car(l), all_nums(cdr(l))) :
+        all_nums(cdr(l))
     );
 };
