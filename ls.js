@@ -389,3 +389,77 @@ all_nums = function (l) {
         all_nums(cdr(l))
     );
 };
+
+// returns true if atoms a1 and a2 are the same
+eqan = function (a1, a2) {
+    return (
+        number(a1) && number(a2) ? neq(a1, a2) :
+        number(a1) || number(a2) ? false :
+        eq(a1, a2)
+    );
+};
+
+// returns the number of times atom a occurs in lat l
+occur = function (a, l) {
+    return (
+        isNull(l) ? 0 :
+        eqan(a, car(l)) ? add1(occur(a, cdr(l))) :
+        occur(a, cdr(l))
+    );
+};
+
+// returns true if number n is 1, otherwise returns false
+one = function (n) {
+    return (
+        neq(n, 1)
+    );
+};
+
+rempick2 = function (n, l) {
+    return (
+        isNull(l) ? [] :
+        one(n) ? rempick2(sub1(n), cdr(l)) :
+        cons(car(l), rempick2(sub1(n), cdr(l)))
+    );
+};
+
+// Chapter 5
+
+// returns lat l with all occurances of atom a removed       
+// * descends into sublists
+remberstar = function (a, l) {
+    return (
+        isNull(l) ? [] :
+        atom(car(l)) ? (
+            a === car(l) ? remberstar(a, cdr(l)) :
+            cons(car(l), remberstar(a, cdr(l)))
+        ) :
+        cons(remberstar(a, car(l)), remberstar(a, cdr(l)))
+    );
+};
+// inserts new atom n to the right of the all occurance of old atom o in list l
+// * descends into sublists
+insertRstar = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        atom(car(l)) ? (
+            o === car(l) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
+            cons(car(l), multiinsertR(n, o, cdr(l)))
+        ) :
+        cons(insertRstar(n, o, car(l)), insertRstar(n, o, cdr(l)))
+    );
+};
+
+// returns the number of times atom a occurs in lat l
+// * descends into sublists
+occurstar = function (a, l) {
+    return (
+        isNull(l) ? 0 :
+        atom(car(l)) ? (
+            eqan(a, car(l)) ? add1(occurstar(a, cdr(l))) :
+            occurstar(a, cdr(l))
+        ) :
+        plus(occurstar(a, car(l)), occurstar(a, cdr(l)))
+    );
+};
+
