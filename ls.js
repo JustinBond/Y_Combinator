@@ -463,3 +463,41 @@ occurstar = function (a, l) {
     );
 };
 
+// substitutes new atom n for the first occurance of old atom o in list l
+// * descends into sublists
+subststar = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        atom(car(l)) ? (
+            o === car(l) ? cons(n, subststar(n, o, cdr(l))) :
+            cons(car(l), subststar(n, o, cdr(l)))
+        ) :
+        cons(subststar(n, o, car(l)), subststar(n, o, cdr(l)))
+    );
+};
+
+// inserts new atom n to the left of the first occurance of old atom o in list l
+// * descends into sublists
+insertLstar = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        atom(car(l)) ? (
+            o === car(l) ? cons(n, cons(o, insertLstar(n, o, cdr(l)))) :
+            cons(car(l), insertLstar(n, o, cdr(l)))
+        ) :
+        cons(insertLstar(n, o, car(l)), insertLstar(n, o, cdr(l)))
+    );
+};
+
+// returns true if atom a is a member of lat l
+memberstar = function (a, l) {
+    return (
+        isNull(l) ? false :
+        atom(car(l)) ? (
+            eq(a, car(l)) ? true :
+            member(a, cdr(l))
+        ) :
+        member(a, car(l)) || member(a, cdr(l))
+    );
+};
+
