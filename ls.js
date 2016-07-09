@@ -39,7 +39,43 @@ var debug,
     pick,
     rempick,
     no_nums,
+    eqan,
+    occur,
+    one,
+    rempick2,
+    remberstar,
+    insertRstar,
+    insertLstar,
+    occurstar,
+    subststar,
+    insertLstar,
+    leftmost,
+    eqlist,
+    numbered,
+    memberstar,
+    value2,
+    value,
+    set,
     all_nums,
+    first_sub_exp,
+    second_sub_exp,
+    operator,
+    first,
+    second,
+    makeset,
+    makeset2,
+    subset,
+    eqset,
+    does_intersect,
+    intersect,
+    union,
+    intersectall,
+    a_pair,
+    third,
+    build,
+    revrel,
+    one_to_one,
+    fun,
     foo;
 
 debug = false;
@@ -120,7 +156,7 @@ member2 = function (a, l) {
     );
 };
 
-// member using boolean operators rather than cond (AKA ternary)
+// member using boolean operators rather than ternary
 member3= function (a, l) {
     return (
         !isNull(l)
@@ -535,14 +571,191 @@ numbered = function (aexp) {
         eq(car(cdr(aexp)), 'x') ? numbered(car(aexp)) && numbered(car(cdr(cdr(aexp)))) :
         eq(car(cdr(aexp)), '^') && (numbered(car(aexp)) && numbered(car(cdr(cdr(aexp)))))
     );
-}
+};
 
-// returns the value of the arithmetic expression
+// returns the value of the arithmetic expression in the format of [2,'+',2]
+value2 = function (nexp) {
+    return (
+        atom(nexp) ? nexp :
+        eq(car(cdr(nexp)), '+') ? plus(value2(car(nexp)), value2(car(cdr(cdr(nexp))))) :
+        eq(car(cdr(nexp)), 'x') ? multiply(value2(car(nexp)), value2(car(cdr(cdr(nexp))))) :
+        eq(car(cdr(nexp)), '^') && exp(value2(car(nexp)), value2(car(cdr(cdr(nexp)))))
+    );
+};
+
+// returns the first sub expression of an arithmetic expression in the format of ['+',2,2]
+first_sub_exp = function (aexp) {
+    return (
+        car(cdr(aexp))
+    );
+};
+
+// returns the second sub expression of an arithmetic expression in the format of ['+',2,2]
+second_sub_exp = function (aexp) {
+    return (
+        car(cdr(cdr(aexp)))
+    );
+};
+// returns the operator of an arithmetic expression in the format of ['+',2,2]
+operator = function (aexp) {
+    return (
+        car(aexp)
+    );
+};
+
+// returns the value of the arithmetic expression in the format of [2,'+',2]
 value = function (nexp) {
     return (
         atom(nexp) ? nexp :
-        eq(car(cdr(nexp)), '+') ? plus(value(car(nexp)), value(car(cdr(cdr(nexp))))) :
-        eq(car(cdr(nexp)), 'x') ? multiply(value(car(nexp)), value(car(cdr(cdr(nexp))))) :
-        eq(car(cdr(nexp)), '^') && exp(value(car(nexp)), value(car(cdr(cdr(nexp)))))
+        eq(operator(nexp), '+') ? plus(value(first_sub_exp(nexp)), value(second_sub_exp(nexp))) :
+        eq(operator(nexp), 'x') ? multiply(value(first_sub_exp(nexp)), value(second_sub_exp(nexp))) :
+        eq(operator(nexp), '^') && exp(value(first_sub_exp(nexp)), value(second_sub_exp(nexp)))
     );
-}
+};
+
+// returns true if no member of lat l occurs more than once
+set = function (l) {
+    return (
+        isNull(l) ? true :
+        member(car(l),cdr(l)) ? false :
+        set(cdr(l))
+    );
+};
+
+// returns a set by removing extra occurances of lat l's members
+makeset = function (l) {
+    return (
+        isNull(l) ? [] :
+        set(l) ? l :
+        member(car(l), cdr(l)) ? makeset(cdr(l)) :
+        cons(car(l), makeset(cdr(l)))
+    );
+};
+
+// returns a set by removing extra occurances of lat l's members, using multirember
+makeset2 = function (l) {
+    return (
+        isNull(l) ? [] :
+        set(l) ? l :
+        cons(car(l), makeset(multirember(car(l), cdr(l))))
+    );
+};
+
+// returns true if s1 is a subset of s2
+subset = function (s1, s2) {
+    return (
+        isNull(s1) ? true :
+        member(car(s1), s2) ? subset(cdr(s1), s2) :
+        false
+    ); 
+};
+
+// returns true if s1 and s2 are the same
+eqset = function (s1, s2) {
+    return (
+        subset(s1, s2) && subset(s2, s1)
+    );
+};
+
+// returns true if s1 intersects s2
+does_intersect = function (s1, s2) {
+    return (
+        isNull(s1) ? false :
+        member(car(s1), s2) ? true :
+        does_intersect(cdr(s1), s2)
+    );
+};
+
+// returns the intersections of sets s1 and s2
+intersect = function (s1, s2) {
+    return (
+        isNull(s1) ? [] :
+        member(car(s1), s2) ? cons(car(s1), intersect(cdr(s1), s2)) :
+        intersect(cdr(s1), s2)
+    );
+};
+// returns the unions of sets s1 and s2
+union = function (s1, s2) {
+    return (
+        isNull(s1) ? [] :
+        member(car(s1), s2) ? union(cdr(s1), s2) :
+        cons(car(s1), union(cdr(s1), s2))
+    );
+};
+
+intersectall = function (lset) {
+    return (
+        isNull(cdr(lset)) ? car(lset) :
+        intersect(car(lset), intersectall(cdr(lset)))
+    );
+};
+
+// returns true if x is a list of two s-expressions
+a_pair = function (x) {
+    return (
+        atom(x) ? false :
+        isNull(x) ? false :
+        isNull(cdr(x)) ? false :
+        isNull(cdr(cdr(x))) ? true :
+        false
+    
+    );
+};
+
+// returns the first of a pair
+first = function (p) {
+    return (
+        car(p)
+    );
+};
+
+// returns the second of a pair
+second = function (p) {
+    return (
+        car(cdr(p))
+    );
+};
+
+// returns the third in a list
+third = function (l) {
+    return (
+        car(cdr(cdr(l)))
+    );
+};
+
+// returns the first from a relation
+firsts = function(rel) {
+    return (
+        isNull(rel) ? [] :
+        cons(first(car(rel)), firsts(cdr(rel)))
+    );
+};
+
+// builds a pair
+build = function (s1, s2) {
+    return (
+        cons(s1, cons(s2, []))
+    );
+};
+// returns true of rel is a finite function (a list of pairs such that
+// no first element is the same)
+fun = function (rel) {
+    return (
+        set(firsts(rel))
+    );
+};
+
+// reverses a relation
+revrel = function (rel) {
+    return (
+        isNull(rel) ? [] :
+        cons(build(second(car(rel)), first(car(rel))), revrel(cdr(rel)))
+    );
+};
+
+// returns true if a function is one-to-one
+one_to_one = function (f) {
+    return (
+        fun(revrel(f))
+    );
+};
