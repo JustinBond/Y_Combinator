@@ -501,3 +501,48 @@ memberstar = function (a, l) {
     );
 };
 
+// returns true if atom a is a member of lat l
+leftmost = function (l) {
+    return (
+        isNull(l) ? [] :
+        atom(car(l)) ? car(l) :
+        leftmost(car(l))
+    );
+};
+
+// returns true if lists of s-expressions l1 and l2 are equal
+eqlist = function (l1, l2) {
+    return (
+        isNull(l1) && isNull(l2) ? true :
+        isNull(l1) || isNull(l2) ? false :
+        atom(car(l1)) && atom(car(l2)) ? (
+            eqan(car(l1), car(l2)) ? eqlist(cdr(l1), cdr(l2)) :
+            false
+        ) :
+        atom(car(l1)) || atom(car(l2)) ? false :
+        eqlist(car(l1), car(l2)) && eqlist(cdr(l1), cdr(l2))
+    );
+};
+
+// Chapter 6
+
+// returns true if representation of arithmetic expression contains only
+// numbers in addition to +, x, and ^
+numbered = function (aexp) {
+    return (
+        atom(aexp) ? number(aexp) :
+        eq(car(cdr(aexp)), '+') ? numbered(car(aexp)) && numbered(car(cdr(cdr(aexp)))) :
+        eq(car(cdr(aexp)), 'x') ? numbered(car(aexp)) && numbered(car(cdr(cdr(aexp)))) :
+        eq(car(cdr(aexp)), '^') && (numbered(car(aexp)) && numbered(car(cdr(cdr(aexp)))))
+    );
+}
+
+// returns the value of the arithmetic expression
+value = function (nexp) {
+    return (
+        atom(nexp) ? nexp :
+        eq(car(cdr(nexp)), '+') ? plus(value(car(nexp)), value(car(cdr(cdr(nexp))))) :
+        eq(car(cdr(nexp)), 'x') ? multiply(value(car(nexp)), value(car(cdr(cdr(nexp))))) :
+        eq(car(cdr(nexp)), '^') && exp(value(car(nexp)), value(car(cdr(cdr(nexp)))))
+    );
+}
