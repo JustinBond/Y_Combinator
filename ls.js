@@ -48,7 +48,6 @@ var debug,
     insertLstar,
     occurstar,
     subststar,
-    insertLstar,
     leftmost,
     eqlist,
     numbered,
@@ -152,35 +151,18 @@ member = function (a, l) {
 member2 = function (a, l) {
     return (
         isNull(l) ? false :
-        ((a === car(l)) || member(a, cdr(l)))
+        eq(a, car(l)) || member(a, cdr(l))
     );
-};
-
-// member using boolean operators rather than ternary
-member3= function (a, l) {
-    return (
-        !isNull(l)
-        && ((a === car(l)) || member(a, cdr(l)))
-    );
-
 };
 
 // returns lat l with first occurance of atom a removed       
 rember = function (a, l) {
     return (
         isNull(l) ? [] :
-        a === car(l) ? cdr(l) :
+        eq(a, car(l)) ? cdr(l) :
         cons(car(l), rember(a, cdr(l)))
     );
 };
-
-// rember using boolean operators rather than cond (AKA ternary)
-rember2 = function (a, l) {
-    return (isNull(l) && [])
-           || (a === car(l) && cdr(l))
-           || (cons(car(l), rember(a, cdr(l))));
-};
-
 
 // takes a null list or list of lists and returns a list of the first item
 // in each sub-list
@@ -201,7 +183,7 @@ firsts2 = function (l) {
 insertR = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(car(l), cons(n, cdr(l))) :
+        eq(o, car(l)) ? cons(car(l), cons(n, cdr(l))) :
         cons(car(l), insertR(n, o, cdr(l)))
     );
 };
@@ -211,7 +193,7 @@ insertR = function (n, o, l) {
 insertL = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(n, l) :
+        eq(o, car(l)) ? cons(n, l) :
         cons(car(l), insertL(n, o, cdr(l)))
     );
 };
@@ -220,7 +202,7 @@ insertL = function (n, o, l) {
 subst = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(n, cdr(l)) :
+        eq(o, car(l)) ? cons(n, cdr(l)) :
         cons(car(l), subst(n, o, cdr(l)))
     );
 };
@@ -229,7 +211,7 @@ subst = function (n, o, l) {
 subst2 = function (n, o1, o2, l) {
     return (
         isNull(l) ? [] :
-        (o1 === car(l) || o2 === car(l)) ? cons(n, cdr(l)) :
+        eq(o1, car(l)) || eq(o2, car(l)) ? cons(n, cdr(l)) :
         cons(car(l), subst2(n, o1, o2, cdr(l)))
     );
 };
@@ -238,7 +220,7 @@ subst2 = function (n, o1, o2, l) {
 multirember = function (a, l) {
     return (
         isNull(l) ? [] :
-        a === car(l) ? multirember(a, cdr(l)) :
+        eq(a, car(l)) ? multirember(a, cdr(l)) :
         cons(car(l), multirember(a, cdr(l)))
     );
 };
@@ -247,7 +229,7 @@ multirember = function (a, l) {
 multiinsertR = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
+        eq(o, car(l)) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
         cons(car(l), multiinsertR(n, o, cdr(l)))
     );
 };
@@ -256,7 +238,7 @@ multiinsertR = function (n, o, l) {
 multiinsertL = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(n, cons(o, multiinsertL(n, o, cdr(l)))) :
+        eq(o, car(l)) ? cons(n, cons(o, multiinsertL(n, o, cdr(l)))) :
         cons(car(l), multiinsertL(n, o, cdr(l)))
     );
 };
@@ -265,7 +247,7 @@ multiinsertL = function (n, o, l) {
 multisubst = function (n, o, l) {
     return (
         isNull(l) ? [] :
-        o === car(l) ? cons(n, multisubst(n, o, cdr(l))) :
+        eq(o, car(l)) ? cons(n, multisubst(n, o, cdr(l))) :
         cons(car(l), multisubst(n, o, cdr(l)))
     );
 };
@@ -467,7 +449,7 @@ remberstar = function (a, l) {
     return (
         isNull(l) ? [] :
         atom(car(l)) ? (
-            a === car(l) ? remberstar(a, cdr(l)) :
+            eq(a, car(l)) ? remberstar(a, cdr(l)) :
             cons(car(l), remberstar(a, cdr(l)))
         ) :
         cons(remberstar(a, car(l)), remberstar(a, cdr(l)))
@@ -479,7 +461,7 @@ insertRstar = function (n, o, l) {
     return (
         isNull(l) ? [] :
         atom(car(l)) ? (
-            o === car(l) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
+            eq(o, car(l)) ? cons(o, multiinsertR(n, o, cons(n, cdr(l)))) :
             cons(car(l), multiinsertR(n, o, cdr(l)))
         ) :
         cons(insertRstar(n, o, car(l)), insertRstar(n, o, cdr(l)))
@@ -505,7 +487,7 @@ subststar = function (n, o, l) {
     return (
         isNull(l) ? [] :
         atom(car(l)) ? (
-            o === car(l) ? cons(n, subststar(n, o, cdr(l))) :
+            eq(o, car(l)) ? cons(n, subststar(n, o, cdr(l))) :
             cons(car(l), subststar(n, o, cdr(l)))
         ) :
         cons(subststar(n, o, car(l)), subststar(n, o, cdr(l)))
@@ -518,7 +500,7 @@ insertLstar = function (n, o, l) {
     return (
         isNull(l) ? [] :
         atom(car(l)) ? (
-            o === car(l) ? cons(n, cons(o, insertLstar(n, o, cdr(l)))) :
+            eq(o, car(l)) ? cons(n, cons(o, insertLstar(n, o, cdr(l)))) :
             cons(car(l), insertLstar(n, o, cdr(l)))
         ) :
         cons(insertLstar(n, o, car(l)), insertLstar(n, o, cdr(l)))
@@ -559,6 +541,43 @@ eqlist = function (l1, l2) {
         eqlist(car(l1), car(l2)) && eqlist(cdr(l1), cdr(l2))
     );
 };
+
+// returns true if s-expressions s1 and s2 are the same
+equal = function (s1, s2) {
+    return (
+        (atom(s1) && atom(s2)) ? eqan(s1, s2) :
+        (atom(s1) || atom(s2)) ? false :
+        eqlist(s1, s2)
+    );
+};
+
+// simplification of the original eqlist using equal
+eqlist = function (l1, l2) {
+    return (
+        isNull(l1) && isNull(l2) ? true :
+        isNull(l1) || isNull(l2) ? false :
+        (equal(car(l1), car(l2)) && eqlist(cdr(l1), cdr(l2)))
+    );
+};
+
+// inserts new s-expression n to the left of the first occurance of old 
+// s-expression o in list l
+insertL = function (n, o, l) {
+    return (
+        isNull(l) ? [] :
+        equal(o, car(l)) ? cons(n, l) :
+        cons(car(l), insertL(n, o, cdr(l)))
+    );
+};
+
+rember = function (s, l) {
+    return (
+        isNull(l) ? [] :
+        equal(car(l), s) ? cdr(l) :
+        cons(car(l), rember(s, cdr(l)))
+    );
+};
+
 
 // Chapter 6
 
