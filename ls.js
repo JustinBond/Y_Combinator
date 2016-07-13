@@ -75,6 +75,9 @@ var debug,
     revrel,
     one_to_one,
     fun,
+    equal,
+    rember_f,
+    insertL_f,
     foo;
 
 debug = false;
@@ -570,6 +573,7 @@ insertL = function (n, o, l) {
     );
 };
 
+// rewriting rember using equal
 rember = function (s, l) {
     return (
         isNull(l) ? [] :
@@ -778,3 +782,83 @@ one_to_one = function (f) {
         fun(revrel(f))
     );
 };
+
+// Chapter 8
+
+// creates member functions based on the function test
+rember_f = function (test) {
+    return function (a, l) {
+        return (
+            isNull(l) ? [] :
+            test(car(l), a) ? cdr(l) :
+            cons(car(l), rember_f(test)(a, cdr(l)))
+        );
+    };
+};
+
+// inserts new atom n to the left of the first occurance of old atom o in list l
+// based on equality function test
+insertL_f = function (test) {
+    return function (n, o, l) {
+        return (
+            isNull(l) ? [] :
+            test(o, car(l)) ? cons(n, l) :
+            cons(car(l), insertL_f(test)(n, o, cdr(l)))
+        );
+    };
+};
+
+// cons's new element n to the left of old element o on list l
+seqL = function (n, o, l) {
+    return (
+        cons(n, cons(o,l))
+    );
+};
+//
+// cons's new element n to the right of old element o on list l
+seqR = function (n, o, l) {
+    return (
+        cons(o, cons(n,l))
+    );
+};
+
+// replaces first instance of element o with element n
+seqS = function (n, o, l) {
+    return (
+        cons(n,l)
+    );
+};
+
+// inserts new atom n to the left or right the first occurance of old atom o in list l
+// function seq
+seq_f = function (seq) {
+    return function (n, o, l) {
+        return (
+            isNull(l) ? [] :
+            eq(o, car(l)) ? seq(n, o, l) :
+            cons(car(l), seq_f(seq)(n, o, cdr(l)))
+        );
+    };
+};
+
+// redefining insertL, insertR, subst
+insertL = seq_f(seqL);
+insertR = seq_f(seqR);
+subst = seq_f(seqS);
+
+atom_to_function = function (op) {
+    return (
+        eq('+', op) ? plus :
+        eq('*', op) ? multiply :
+        exp 
+    );
+};
+
+// simplifying value
+value = function (nexp) {
+    return (
+        atom(nexp) ? nexp :
+        atom_to_function(operator(nexp))(value(first_sub_exp(nexp)), value(second_sub_exp(nexp)))
+    );
+};
+
