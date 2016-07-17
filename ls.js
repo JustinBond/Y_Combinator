@@ -941,8 +941,7 @@ length1_maker = function (length) {
     );
 }
 
-// The hard way to make length1 - creating a length1_maker using anonymous functions
-// and then invoking length1_maker
+// The hard way to make length1 - composing anonymous length0_maker functions
 length1 = 
 (function (length) {return (
     function (l) {return (
