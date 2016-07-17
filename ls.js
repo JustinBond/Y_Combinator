@@ -115,6 +115,7 @@ cons = function (s, l) {
 
 // returns true if list l is zero length
 isNull = function (l) {
+    print("l is: " + l);
     return l.length === 0;
 };
 
@@ -862,3 +863,96 @@ value = function (nexp) {
     );
 };
 
+// returns lat l with all occurances of atom a removed       
+multirember_f = function (test) {
+    return function (a, l) {
+        return (
+            isNull(l) ? [] :
+            test(a, car(l)) ? multirember_f(test)(a, cdr(l)) :
+            cons(car(l), multirember_f(test)(a, cdr(l)))
+        );
+    };
+};
+
+multirember_co = function (a, l, col) {
+    return (
+        isNull(l) ? [] :
+        eq(a, car(l)) ? multirember_co(a, cdr(l), function (notseen, seen) {
+            col(notseen, cons(car(l), seen))
+        }) :
+        multirember_co(a, cdr(l), function (notseen, seen) {
+            col(cons(car(l), notseen), seen)
+       })
+    );
+}
+
+// Chapter 9
+//
+eternity = function (l) {
+    return (
+        undefined
+    );
+};
+
+// length0: anonymous function that calculates length of null list
+// I'm cheating a bit by giving it a name so I can test it, but in keeping with the
+// spirit of the exercise, I'm not recursively using the name
+_length0 = function (l) {
+    return (
+        isNull(l) ? 0 :
+        add1(eternity(cdr(l)))
+    );
+};
+
+// length1: anonymous function that calculates length of null list or list of 1 item
+// I'm cheating a bit by giving it a name so I can test it, but in keeping with the
+// spirit of the exercise, I'm not recursively using the name
+_length1 = function (l) {
+    return (
+        isNull(l) ? 0 :
+        add1((function (l) {
+            return (
+                isNull(l) ? 0 :
+                add1(eternity(cdr(l)))
+            );
+        })(cdr(l)))
+    );
+};
+
+// length0_maker - function that returns length0
+length0_maker = function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+);};
+
+// Now make length0
+length0 = length0_maker(eternity);
+
+
+// The really easy way to make length1 - compose calls to length0
+length1 = length0_maker(length0_maker(eternity));
+
+// The only slightly less easy way to make length1 - define a length1_maker
+length1_maker = function (length) {
+    return (
+        length0_maker(length0_maker(length))
+    );
+}
+
+// The hard way to make length1 - creating a length1_maker using anonymous functions
+// and then invoking length1_maker
+length1 = 
+(function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+);})(
+(function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+);})(eternity))
