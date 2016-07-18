@@ -895,8 +895,6 @@ eternity = function (l) {
 };
 
 // length0: anonymous function that calculates length of null list
-// I'm cheating a bit by giving it a name so I can test it, but in keeping with the
-// spirit of the exercise, I'm not recursively using the name
 _length0 = function (l) {
     return (
         isNull(l) ? 0 :
@@ -905,8 +903,6 @@ _length0 = function (l) {
 };
 
 // length1: anonymous function that calculates length of null list or list of 1 item
-// I'm cheating a bit by giving it a name so I can test it, but in keeping with the
-// spirit of the exercise, I'm not recursively using the name
 _length1 = function (l) {
     return (
         isNull(l) ? 0 :
@@ -930,16 +926,8 @@ length0_maker = function (length) {return (
 // Now make length0
 length0 = length0_maker(eternity);
 
-
-// The really easy way to make length1 - compose calls to length0
+// The easy way to make length1 - compose calls to length0
 length1 = length0_maker(length0_maker(eternity));
-
-// The only slightly less easy way to make length1 - define a length1_maker
-length1_maker = function (length) {
-    return (
-        length0_maker(length0_maker(length))
-    );
-}
 
 // The hard way to make length1 - composing anonymous length0_maker functions
 length1 = 
@@ -955,3 +943,50 @@ length1 =
         add1(length(cdr(l)))
     );}
 );})(eternity))
+
+// The next layer of abstraction lets us pass in length0_maker as an argument
+
+length0 =
+(function (mk_length) {return (
+    (mk_length(eternity))
+)})(
+function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+)})
+
+length1 =
+(function (mk_length) {return (
+    (mk_length(mk_length(eternity)))
+)})(
+function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+)})
+
+length2 =
+(function (mk_length) {return (
+    (mk_length(mk_length(mk_length(eternity))))
+)})(
+function (length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    );}
+)})
+
+length =
+(function (mk_length) {return (
+    (mk_length(mk_length))
+)})(
+function (mk_length) {return (
+    function (l) {return (
+        isNull(l) ? 0 :
+        add1(mk_length(mk_length)(cdr(l)))
+    );}
+)})
+
