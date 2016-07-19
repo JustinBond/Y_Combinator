@@ -888,6 +888,26 @@ multirember_co = function (a, l, col) {
 
 // Chapter 9
 //
+// This is the chapter that culminates with building the Y Combinator
+//
+// Our entry into the Y Combinator is this challenge: how would you write a function that
+// returns the length of a list if you can't actually name that function? 
+//
+// Here is the normal way to do it:
+length = function(l) {
+    return (
+        isNull(l) ? 0 :
+        add1(length(cdr(l)))
+    )
+}
+
+// But see how length calls itself to continue the recursion? Since we're not allowed to do that, we'll need
+// to figure out another way.
+
+// Eternity. A function that never returns. (I'm having it return undefined)
+// 
+// Eternity plays an important role in this exercise - when you "run out of recursions" you'll hit eternity. 
+// So our ultimate goal is to build a length function that never "hits eternity."
 eternity = function (l) {
     return (
         undefined
@@ -895,7 +915,10 @@ eternity = function (l) {
 };
 
 // length0: anonymous function that calculates length of null list
-_length0 = function (l) {
+// * Note: I gave it a name so I could test it, but I'm not actually using that name to recurse
+// * Give length0 a list with one element and it will "hit eternity" and fail.
+// * Note how length0 is exactly like length above, except that we called eternity instead of length
+length0 = function (l) {
     return (
         isNull(l) ? 0 :
         add1(eternity(cdr(l)))
@@ -903,7 +926,11 @@ _length0 = function (l) {
 };
 
 // length1: anonymous function that calculates length of null list or list of 1 item
-_length1 = function (l) {
+//
+// length1 is exactly the same as length0 except that we replaced eternity with the function
+// definition of length 0. We could make a length2 by swapping out length1's eternity with the
+// funciton definition of length0. We could make length3 by ...
+length1 = function (l) {
     return (
         isNull(l) ? 0 :
         add1((function (l) {
@@ -916,6 +943,10 @@ _length1 = function (l) {
 };
 
 // length0_maker - function that returns length0
+// 
+// The secret of length1 was swapping in the function definition of length0 in place of eternity.
+// That's exactly what the length0_maker function does: we call the argument to length0_maker instead
+// of eternity.
 length0_maker = function (length) {return (
     function (l) {return (
         isNull(l) ? 0 :
@@ -923,13 +954,18 @@ length0_maker = function (length) {return (
     );}
 );};
 
-// Now make length0
+// Our game of not using function definitions technically prohibits us from doing this, but it helps to
+// think about what we've accomplished with length0_maker.
+
 length0 = length0_maker(eternity);
-
-// The easy way to make length1 - compose calls to length0
 length1 = length0_maker(length0_maker(eternity));
+length2 = length0_maker(length0_maker(length0_maker(eternity)))
 
-// The hard way to make length1 - composing anonymous length0_maker functions
+
+// length1 - calculates the length of null lists or lists of length 1
+//
+// It's a lot harder when you can't name your functions, but the idea is the same: we're composing calls to
+// length0_maker
 length1 = 
 (function (length) {return (
     function (l) {return (
@@ -944,8 +980,10 @@ length1 =
     );}
 );})(eternity))
 
-// The next layer of abstraction lets us pass in length0_maker as an argument
-
+// The next layer of abstraction lets us pass in length0_maker as an argument. That gives us two big advantages:
+// 1. We only have to write it out once
+// 2. And more important, we now have a name for length0_maker - the name of the function argument. (We'll 
+// call it mk_length). So now we can simply call mk_length.
 length0 =
 (function (mk_length) {return (
     (mk_length(eternity))
