@@ -979,14 +979,77 @@ function (length) {return (
     );}
 )})
 
+// Now the hard work is paying off - it's fairly easy to build a length function
+// using the techniques we've developed
 length =
 (function (mk_length) {return (
-    (mk_length(mk_length))
+    mk_length(mk_length)
 )})(
-function (mk_length) {return (
+    function (mk_length) {return (
+        function (l) {return (
+            isNull(l) ? 0 :
+            add1(mk_length(mk_length)(cdr(l)))
+        );}
+    )}
+)
+
+// A more sophisticated variant that allows us to name length
+length =
+(function (mk_length) {return (
+    mk_length(mk_length)
+)})(
+    function (mk_length) {return (
+        function (l) {return (
+            isNull(l) ? 0 :
+            add1((function(x) {return (
+                mk_length(mk_length)(x)
+            )})(cdr(l)))
+        );}
+    )}
+)
+
+// There is only one problem with our length function - it would be cool to 
+// separate the mk-length functionality from the length function itself
+//
+// We'll do that by passing the length function to the mk_length function as an
+// argument.
+
+length_almost_y = (function (le) {return (
+    (function (mk_length) {return (
+        mk_length(mk_length)
+    )})(
+        function (mk_length) {return (
+            le(function (x) {return (
+                mk_length(mk_length)(x)
+            )})
+        )}
+    )
+)})(
+    function (length) {return (
+        function (l) {return (
+            isNull(l) ? 0 :
+            add1(length(cdr(l)))
+        );}
+    )}
+)
+
+// Guess what the Y Combinator is? It's the mk-length part of the function above.
+Y = function (le) {return (
+    (function (f) {return (
+        f(f)
+    )})(
+        function (f) {return (
+            le(function (x) {return (
+                    f(f(x))
+                )}
+            )
+        )}
+    )
+)};
+
+mk_length = function (length) {return (
     function (l) {return (
         isNull(l) ? 0 :
-        add1(mk_length(mk_length)(cdr(l)))
+        add1(length(cdr(l)))
     );}
-)})
-
+)}
