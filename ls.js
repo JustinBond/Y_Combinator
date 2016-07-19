@@ -1017,8 +1017,12 @@ function (length) {return (
     );}
 )})
 
-// Now the hard work is paying off - it's fairly easy to build a length function
-// using the techniques we've developed
+// Ok, so far the problem is that we'll run into eternity unless we manually stick in another
+// call to mk_length. What wee need is a way to automatically stick in that extra call. And that's
+// what we're going to do here.
+//
+// The way we do that is by calling mk_length on itself: mk_length(mk_length)
+// Then instead of running into eternity, we'll run into another call to mk_length
 length =
 (function (mk_length) {return (
     mk_length(mk_length)
