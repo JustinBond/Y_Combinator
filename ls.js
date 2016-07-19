@@ -1040,7 +1040,7 @@ Y = function (le) {return (
     )})(
         function (f) {return (
             le(function (x) {return (
-                    f(f(x))
+                    f(f)(x)
                 )}
             )
         )}
@@ -1053,3 +1053,7 @@ mk_length = function (length) {return (
         add1(length(cdr(l)))
     );}
 )}
+
+// Now use the Y combinator to create length
+length = Y(mk_length)
+
