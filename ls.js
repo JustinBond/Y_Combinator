@@ -914,10 +914,10 @@ eternity = function (l) {
     );
 };
 
-// length0: anonymous function that calculates length of null list
+// length0: anonymous function that calculates length of null list. Give it a list with one or mull elements
+// and it will hit eternity and fail.
 // * Note: I gave it a name so I could test it, but I'm not actually using that name to recurse
-// * Give length0 a list with one element and it will "hit eternity" and fail.
-// * Note how length0 is exactly like length above, except that we called eternity instead of length
+// * Note that length0 is exactly like length above, except that we called eternity instead of itself.
 length0 = function (l) {
     return (
         isNull(l) ? 0 :
@@ -929,7 +929,7 @@ length0 = function (l) {
 //
 // length1 is exactly the same as length0 except that we replaced eternity with the function
 // definition of length 0. We could make a length2 by swapping out length1's eternity with the
-// funciton definition of length0. We could make length3 by ...
+// function definition of length0. We could make length3 by ...
 length1 = function (l) {
     return (
         isNull(l) ? 0 :
@@ -945,8 +945,7 @@ length1 = function (l) {
 // length0_maker - function that returns length0
 // 
 // The secret of length1 was swapping in the function definition of length0 in place of eternity.
-// That's exactly what the length0_maker function does: we call the argument to length0_maker instead
-// of eternity.
+// The length0_maker function makes that easier.
 length0_maker = function (length) {return (
     function (l) {return (
         isNull(l) ? 0 :
@@ -964,8 +963,8 @@ length2 = length0_maker(length0_maker(length0_maker(eternity)))
 
 // length1 - calculates the length of null lists or lists of length 1
 //
-// It's a lot harder when you can't name your functions, but the idea is the same: we're composing calls to
-// length0_maker
+// It's a lot harder to make length1 when you can't name your functions. Here I'm doing the exact same thing as
+// above, but using the function definition of length0_maker instead of calling it by name.
 length1 = 
 (function (length) {return (
     function (l) {return (
@@ -980,10 +979,11 @@ length1 =
     );}
 );})(eternity))
 
-// The next layer of abstraction lets us pass in length0_maker as an argument. That gives us two big advantages:
-// 1. We only have to write it out once
-// 2. And more important, we now have a name for length0_maker - the name of the function argument. (We'll 
-// call it mk_length). So now we can simply call mk_length.
+// The next layer of abstraction lets us pass in length0_maker as an argument. That is a big step! 
+// This method has two advantages:
+// 1. We only have to write the function body of length0_mkaker once
+// 2. And more importantly, we now have a name for length0_maker - the name of the function parameter. (The Little Schemer
+// calls it "mk-length" and I'm going to stick with their convention even though I like the name length0_maker better).
 length0 =
 (function (mk_length) {return (
     (mk_length(eternity))
@@ -1018,11 +1018,19 @@ function (length) {return (
 )})
 
 // Ok, so far the problem is that we'll run into eternity unless we manually stick in another
-// call to mk_length. What wee need is a way to automatically stick in that extra call. And that's
-// what we're going to do here.
+// call to mk_length. What we need is a way to automatically stick in that extra call. That's what
+// this next function does, but it gets a little tricky.
 //
-// The way we do that is by calling mk_length on itself: mk_length(mk_length)
-// Then instead of running into eternity, we'll run into another call to mk_length
+// Trick #1: What the heck is mk_length anyways? It is the argument being passed to the outer function. 
+// mk_length is an imporved version of length0_maker that substitutes mk_length(mk_length) for eternity.
+//
+// Trick #2: realize what mk_length(mk_length) does. mk_length is our improved version
+// of length0_maker. So running it returns length0 with one key difference: instead of calling eternity,
+// it calls mk_length(mk_length) again.
+// mk_length(mk_length) ===> length0 with mk_length(mk_length) instead of eternity
+// 
+// Trick #3: realize that length0 hasn't actually been called yet. It isn't called until
+// we pass to length a list that isn't null. Then mk_length(mk_length) is called. What happens then? See trick #2.
 length =
 (function (mk_length) {return (
     mk_length(mk_length)
