@@ -1099,3 +1099,55 @@ mk_length = function (length) {return (
 // Now use the Y combinator to create length
 length = Y(mk_length)
 
+// Chapter 10
+//
+
+new_entry = build
+
+lookup_in_entry_help = function(name, names, values, entry_f) {return (
+    isNull(names) ? entry_f(name) :
+    eq(car(names), name) ? car(values) :
+    lookup_in_entry_help(name, cdr(names), cdr(values), entry_f)
+)}
+
+lookup_in_entry = function(name, entry, entry_f) {return (
+    lookup_in_entry_help(name, first(entry), second(entry), entry_f)
+)}
+
+extend_table = cons
+
+lookup_in_table = function(name, table, table_f) {return (
+    isNull(table) ? table_f(name) :
+    lookup_in_entry(name, car(table), function (name) {return(
+        lookup_in_table(name, cdr(table), table_f)
+    )})
+)}
+
+expression_to_action = function (e) {return (
+    atom(e) ? atom_to_action(e) :
+    list_to_action(e)
+)}
+
+atom_to_action = function (e) {return (
+    number(e) ? conststar :
+    eq(e, '#t') ? conststar :
+    eq(e, '#f') ? conststar :
+    eq(e, 'cons') ? conststar :
+    eq(e, 'car') ? conststar :
+    eq(e, 'cdr') ? conststar :
+    eq(e, 'null?') ? conststar :
+    eq(e, 'eq?') ? conststar :
+    eq(e, 'atom?') ? conststar :
+    eq(e, 'zero?') ? conststar :
+    eq(e, 'add1') ? conststar :
+    eq(e, 'sub1') ? conststar :
+    eq(e, 'number' ? conststar :
+    identifierstar
+)}
+
+conststar = function (e) {return (
+    "yup it's const"
+)}
+identifierstar = function (e) {return (
+    "yup it's identifier"
+)}
