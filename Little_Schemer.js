@@ -1,98 +1,15 @@
-var debug,
-    atom,
-    car,
-    cdr,
-    cons,
-    isNull,
-    eq,
-    lat,
-    member,
-    member2,
-    member3,
-    rember,
-    rember2,
-    firsts,
-    firsts2,
-    insertR,
-    insertL,
-    subst,
-    subst2,
-    multirember,
-    multiinsertR,
-    multiinsertL,
-    multisubst,
-    zero,
-    add1,
-    sub1,
-    number,
-    plus,
-    minus,
-    addtup,
-    multiply,
-    tupplus,
-    gt,
-    lt,
-    divide,
-    exp,
-    neq,
-    length,
-    pick,
-    rempick,
-    no_nums,
-    eqan,
-    occur,
-    one,
-    rempick2,
-    remberstar,
-    insertRstar,
-    insertLstar,
-    occurstar,
-    subststar,
-    leftmost,
-    eqlist,
-    numbered,
-    memberstar,
-    value2,
-    value,
-    set,
-    all_nums,
-    first_sub_exp,
-    second_sub_exp,
-    operator,
-    first,
-    second,
-    makeset,
-    makeset2,
-    subset,
-    eqset,
-    does_intersect,
-    intersect,
-    union,
-    intersectall,
-    a_pair,
-    third,
-    build,
-    revrel,
-    one_to_one,
-    fun,
-    equal,
-    rember_f,
-    insertL_f,
-    foo;
-
-debug = false;
-
 /*****************************************************************************
  * Primitive functions
 *****************************************************************************/
 
 // returns true if s is a string or number
-atom = function (s) {
+isAtom = function (s) {
     if (typeof s === 'number' || typeof s === 'string') {
         return true;
     }
     return false;
 };
+atom = isAtom
 
 // returns the first element of list l
 car = function (l) {
@@ -129,18 +46,19 @@ eq = function (a, b) {
 *****************************************************************************/
 
 
-// lat: list of atoms
+// isLat: is list of atoms?
 // Returns true if every element of l is an atom
 // Returns true if isNull. So technically, nll (not list of lists).
 //
 
-lat = function (l) {
+isLat = function (l) {
     return (
         isNull(l) ? true :
-        atom(car(l)) ? lat(cdr(l)) :
+        atom(car(l)) ? isLat(cdr(l)) :
         false
     );
 };
+lat = isLat
 
 // returns true if atom a is a member of lat l
 member = function (a, l) {
@@ -254,9 +172,10 @@ multisubst = function (n, o, l) {
  * Primitive numeric functions
 *****************************************************************************/
 // returns true of number n is 0
-zero = function (n) {
+isZero = function (n) {
     return n === 0;
 };
+zero = isZero
 
 // adds 1 to n
 add1 = function (n) {
@@ -269,12 +188,13 @@ sub1 = function (n) {
 };
 
 // returns true if atom a is of type number
-number = function (a) {
+isNumber = function (a) {
     if (typeof a === 'number') {
         return true;
     }
     return false;
 };
+number = isNumber
 /*****************************************************************************
  * Recursive numeric functions
 *****************************************************************************/
