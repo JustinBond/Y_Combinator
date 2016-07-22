@@ -177,12 +177,6 @@ firsts = function (l) {
     );
 };
 
-// using booleans rather than cond (AKA ternary)
-firsts2 = function (l) {
-    return (isNull(l) && [])
-           || cons(car(car(l)), firsts(cdr(l)));
-};
-
 // inserts new atom n to the right of the first occurance of old atom o in list l
 insertR = function (n, o, l) {
     return (
@@ -877,9 +871,9 @@ multirember_f = function (test) {
 multirember_co = function (a, l, col) {
     return (
         isNull(l) ? [] :
-        eq(a, car(l)) ? multirember_co(a, cdr(l), function (notseen, seen) {
+        eq(a, car(l)) ? multirember_co(a, cdr(l), function (notseen, seen) {return (
             col(notseen, cons(car(l), seen))
-        }) :
+            )}) :
         multirember_co(a, cdr(l), function (notseen, seen) {
             col(cons(car(l), notseen), seen)
        })
