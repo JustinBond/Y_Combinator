@@ -1020,3 +1020,9 @@ mk_length = function (length) {return (
 
 // Now use the Y combinator to create length
 length = Y(mk_length)
+firsts = function (l) {
+    return (
+        isNull(l) ? [] :
+        cons(car(car(l)), firsts(cdr(l)))
+    );
+};
