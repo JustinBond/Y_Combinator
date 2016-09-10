@@ -1,6 +1,45 @@
-/*****************************************************************************
+/**
+ * The Little Schemer
+ *
+/* @module LittleSchemer
+/* @author Justin Bond
+/* @summary Making Javascript look like LISP (but without the parenthesis)
+ *
+ * This module implements most of the functions in the book The Little Schemer,
+ * including the Y Combinator. In order to keep as close to the spirit of LISP
+ * as possible, it has a unique style:
+ *
+ * 1. There are no statements (except when re-implementing primitive functions
+ * that do not exist in Javascript.
+ * 
+ * 2. In order to simulate LISP's cond operator, it makes heavy use of ternary 
+ * operator. The salient difference between if/else and the ternary operator
+ * is that the ternary operator is an expression, not a statement. It has a
+ * value just like how a function has a value.
+ **/
+
+//
+// The Ternary Operator by Example
+//
+true ? print("yup, it's true") : print("nope, it's false")
+// yup, it's true
+
+false ? print("yup, it's true") : print("nope, it's false")
+// nope, it's false
+
+// The ternary operator can be chained together to act like a switch statement
+
+false ? print("the first clause is true") : 
+false ? print("The second clause is true") :
+print("Neither clause is true")
+// Neither clause is true
+
+/******************************************************************************
  * Primitive functions
-*****************************************************************************/
+ *
+ * These functions are primitives in most Scheme/LISP implementations, but we
+ * have to re-implement them as functions. 
+ ******************************************************************************/
 
 // returns true if s is a string or number
 isAtom = function (s) {
@@ -11,13 +50,17 @@ isAtom = function (s) {
 };
 atom = isAtom
 
-// returns the first element of list l
+// car, cdr, and cons - old school programming terms.
+//
+// https://en.wikipedia.org/wiki/CAR_and_CDR
+
+// car - returns the first element of a list
 car = function (l) {
     var m = l.slice(0);
     return m.shift();
 };
 
-// returns list l except for the first element
+// cdr - returns list l except for the first element
 cdr = function (l) {
     var m = l.slice(0);
     m.shift();
