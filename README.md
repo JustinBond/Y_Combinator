@@ -1,8 +1,11 @@
-# The Little Schemer (in Javascript)
+# The Y Combinator
 
-Inspired by Douglass Crockford's [The Little Javascripter](http://www.crockford.com/javascript/little.html), this is The Little Schemer implemented in Javascript.
+This repository contains all the problems in the wonderful book *The Little Schemer*, which teaches recursion in Scheme (Lisp) and builds up to creating the Y Combinator. Except that I did it in Javascript instead of Lisp.
 
-One advantage over Crockford's similar work is that this builds up step-by-step to the Y combinator, which could be helpful for people trying to understand how the Y combinator works.
+Be warned that this is not idiomatic Javascript! 
 
-This is not idiomatic Javascript! Instead it is attempting to emulate LISP as closely as possible, so it makes heavy reliance on expressions and the ternary operator to simulate LISP's cond operator.
+Instead it is attempting to emulate LISP as closely as possible. That means:
 
+* There are no statements at all, only expression. Expressions evaluate to a value, statements do not.
+* Everything is in a block in the return expression, because in Lisp functions themselves are expression.
+* It makes heavy use of chained ternary operators (yikes!), because unlike if and switch, the ternary operator is an expression, not a statement.
